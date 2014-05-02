@@ -139,5 +139,6 @@ pollen_meta_neo     <- get_datasetids()
 pollen_meta_calcote <- get_calcote()
 
 pollen_meta <- rbind(pollen_meta_neo, pollen_meta_calcote)
+pollen_meta <- pollen_meta[with(pollen_meta, order(handle)),]
 
 write.table(pollen_meta, paste('pollen_meta_', Sys.Date(), '.csv', sep=''), row.names=FALSE, sep=',', na='')

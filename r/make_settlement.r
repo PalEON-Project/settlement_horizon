@@ -6,6 +6,8 @@ library(reshape)
 library(ggplot2)
 library(grid)
 
+source('r/utils/helpers.r')
+
 use_date = '2014-05-01'
 mainDir  = getwd()
 
@@ -15,7 +17,7 @@ clh.sites <- all.sites[substr(all.sites$datasetID,1,3) == 'CLH',]
 
 neo.sites <- all.sites[substr(all.sites$datasetID,1,3) != 'CLH',]
 
-centers_alb = ll2albers(neo.sites$long, neo.sites$lat)
+centers_alb = ll2albers(neo.sites$lat, neo.sites$long)
 
 neo.sites$x = centers_alb[,1]
 neo.sites$y = centers_alb[,2]
@@ -25,14 +27,14 @@ for (i in 1:nrow(neo.sites)){
   print(i)
   
   # get the data from neotoma 
-  x = get_download(neo.sites$datasetID[i])
+  x = get_download(as.numeric(neo.sites$datasetID[i]))
   
   coords = c(centers_alb[i,1], centers_alb[i,2])
   
   # make the pollen diagram and
   # put the site on a map
-  plot.pd(x, coords, map=us.shp, mainDir='pollen/settlement_horizon_ID')
-  plot.map(x, coords, map=us.shp, mainDir='pollen/settlement_horizon_ID')
+  plot.pd(x, coords, map=us.shp)
+  plot.map(x, coords, map=us.shp, type='neo')
 }
 
 clh <- read.csv('data/pollen_counts_calcote.csv', stringsAsFactors=FALSE)
@@ -49,8 +51,8 @@ for (i in 1:nrow(clh.sites)){
   
   x = clh[idx,1:ncol(clh)]
   coords = c(centers_alb[i,1], centers_alb[i,2])
-  plot.pd.clh(x, coords, map=us.shp, mainDir=mainDir)
-  plot.map(x, coords, map=us.shp, mainDir=mainDir, type='clh')
+  plot.pd.clh(x, coords, map=us.shp)
+  plot.map(x, coords, map=us.shp, type='clh')
   
 }
 

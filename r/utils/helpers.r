@@ -1,4 +1,4 @@
-us.shp <- readShapeLines('stepps2/data/map_data/us_alb.shp',
+us.shp <- readShapeLines('data/us_alb.shp',
                          proj4string=CRS('+init=epsg:3175'))
 
 ll2albers <- function(lat, long){
@@ -15,7 +15,7 @@ ll2albers <- function(lat, long){
   return(centers_alb)
 }
 
-plot.map <- function(x, coords_albers, map=us.shp, mainDir='pollen/settlement_horizon_ID', type){
+plot.map <- function(x, coords_albers, map=us.shp, type){
  
   if (type=='neo'){
     site = paste(x$metadata$dataset$collection.handle, '_', x$metadata$dataset$dataset.id, sep='')
@@ -23,7 +23,7 @@ plot.map <- function(x, coords_albers, map=us.shp, mainDir='pollen/settlement_ho
     site = paste(toupper(x$site[1]), '_', x$datasetID[1], sep='')
   }
   
-  path = file.path(mainDir, 'maps')
+  path = 'maps'#file.path(mainDir, 'maps1')
   
   if (!file.exists(path)){
     dir.create(path)
@@ -44,17 +44,17 @@ plot.map <- function(x, coords_albers, map=us.shp, mainDir='pollen/settlement_ho
 }
 
 
-plot.pd <- function(x, coords_albers, map=us.shp, mainDir='pollen/settlement_horizon_ID/'){
+plot.pd <- function(x, coords, map=us.shp){
   
   site = paste(x$metadata$dataset$collection.handle, '_', x$metadata$dataset$dataset.id, sep='')
 #   path = file.path(mainDir, site)
   
-  path_pd = file.path(mainDir, 'pollen_diagrams')
+  path_pd =  'pollen_diagrams'#file.path(mainDir, 'pollen_diagrams')
   if (!file.exists(path_pd)){
     dir.create(path_pd)
   }
   
-  path_count = file.path(mainDir, 'counts')
+  path_count = 'counts'#file.path(mainDir, 'counts')
   if (!file.exists(path_count)){
     dir.create(path_count)
   }
@@ -124,9 +124,13 @@ plot.pd <- function(x, coords_albers, map=us.shp, mainDir='pollen/settlement_hor
     } 
   }
   
+  hline_top = min(m$depths) - (max(m$depths) - min(m$depths))/100
+  hline_bottom = max(m$depths) + (max(m$depths) - min(m$depths))/100
+  
   p <- ggplot(m, aes(y=depths, x=value))+
     geom_path(colour='steelblue4', aes(x=value, y=depths, linetype = exagr)) +
-    geom_vline(x=15, alpha=0) +
+    geom_vline(x=15, alpha=0) + geom_hline(aes(yintercept=hline, alpha=0), data=data.frame(hline=hline_top)) +
+    geom_hline(aes(yintercept=hline, alpha=0), data=data.frame(hline=hline_bottom)) +
     geom_segment(m[m$exagr == 'no',], mapping=aes(y=depths, x=0, yend=depths, xend=value, colour=sample.id)) +
     scale_color_manual(values=c('steelblue4', 'darkorange1')) + 
     facet_grid(.~variable, space='free_x', scale='free_x') + 
@@ -134,20 +138,20 @@ plot.pd <- function(x, coords_albers, map=us.shp, mainDir='pollen/settlement_hor
     theme(legend.position='none',axis.text.x=element_text(angle=90, hjust=1, vjust=0.5, size=rel(1)), panel.margin = unit(0.5, "lines")) +
     scale_x_continuous(expand=c(0,0)) +
     scale_y_reverse(expand=c(0,0)) + xlab('percent')
-
+#    print(p)
   ggsave(file=paste(path_pd, '/', site, '.pdf', sep=''), width=12, height=8)
 }
 
-plot.pd.clh <- function(x, coords_albers, map=us.shp, mainDir='pollen/settlement_horizon_ID'){
+plot.pd.clh <- function(x, coords_albers, map=us.shp){
   
   site = paste(toupper(x$site[1]), '_', x$datasetID[1], sep='')
   
-  path_pd = file.path(mainDir, 'pollen_diagrams')
+  path_pd = 'pollen_diagrams'#file.path(mainDir, 'pollen_diagrams')
   if (!file.exists(path_pd)){
     dir.create(path_pd)
   }
   
-  path_count = file.path(mainDir, 'counts')
+  path_count = 'counts'#file.path(mainDir, 'counts')
   if (!file.exists(path_count)){
     dir.create(path_count)
   }
@@ -218,9 +222,13 @@ plot.pd.clh <- function(x, coords_albers, map=us.shp, mainDir='pollen/settlement
     } 
   }
   
+  hline_top = min(m$depths) - (max(m$depths) - min(m$depths))/100
+  hline_bottom = max(m$depths) + (max(m$depths) - min(m$depths))/100
+  
   p <- ggplot(m, aes(y=depths, x=value))+
     geom_path(colour='steelblue4', aes(x=value, y=depths, linetype = exagr)) +
-    geom_vline(x=15, alpha=0) +
+    geom_vline(x=15, alpha=0) + geom_hline(aes(yintercept=hline, alpha=0), data=data.frame(hline=hline_top)) +
+    geom_hline(aes(yintercept=hline, alpha=0), data=data.frame(hline=hline_bottom)) +
     geom_segment(m[m$exagr == 'no',], mapping=aes(y=depths, x=0, yend=depths, xend=value, colour=sample.id)) +
     scale_color_manual(values=c('steelblue4', 'darkorange1')) + 
     facet_grid(.~variable, space='free_x', scale='free_x') + 
