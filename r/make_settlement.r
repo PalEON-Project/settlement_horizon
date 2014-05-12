@@ -26,7 +26,11 @@ for (i in 1:nrow(neo.sites)){
   
   print(i)
   
-  # get the data from neotoma 
+  # get the data from neotoma
+  if (neo.sites$datasetID[i] == 2290){
+    print('Rossburg')
+    next
+  }
   x = get_download(as.numeric(neo.sites$datasetID[i]))
   
   coords = c(centers_alb[i,1], centers_alb[i,2])
